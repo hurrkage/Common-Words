@@ -1,5 +1,5 @@
 # Common-Words
-#This task is a development of the example that motivated several of the lectures in the unit: finding all the words in text, and from that, the most common word, etc. The program you are to write should be called common_words. With no arguments, the usage summary should be:
+This task is a development of the example that motivated several of the lectures in the unit: finding all the words in text, and from that, the most common word, etc. The program you are to write should be called common_words. With no arguments, the usage summary should be:
 
 Usage: common_words [-w word | -nth N] <directory of text files>
 
