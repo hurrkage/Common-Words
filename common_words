@@ -1,0 +1,55 @@
+#!/bin/bash
+if [[ $# -lt 1 ]]
+then
+    echo "Usage: common_words [-w word] | -nth N ] <directory of text files" > /dev/stderr
+    exit 0
+fi
+
+if [[ -z "$(ls -A $3)" ]]
+then
+    echo "$3 is a empty directory" > /dev/stderr
+    exit 2
+fi
+
+
+#Case statement to determine which function user has queried
+case $1 in
+    -nth) 
+        for f in $3/*
+        do 
+            tr -cs '[A-Za-z]' '\012' < $f | sort | uniq -c | sort -k 1nr | head -$2 | tail -n1 | awk '{print $2}' >> sortword.txt
+        done
+        common_word=$(sort sortword.txt | uniq -c | sort -k 1nr | head -1 | awk '{print $2}')
+        value=$(sort sortword.txt | uniq -c | sort -k 1nr | head -1 | awk '{print $1}')
+        echo "The $2th most common word is \"$common_word\" across $value files";;
+    -w)
+        if ! [[ $2 =~ ^[a-zA-Z]+$ ]]
+        then 
+            echo "Argument invalid: contains numbers, symbols or special characters"
+            exit 1
+        fi
+
+        for f in $3/*
+        do
+            tr -cs '[A-Za-z]' '\012' < $f | sort | uniq -c | sort -k 1nr | grep -n $2 | cut -d : -f1 | sort -n | head -n1 >> freq_rank.txt
+        done
+        value=$(sort -n freq_rank.txt | head -n1)
+        for i in $3/*
+        do
+            if [[ $value == $(tr -cs '[A-Za-z]' '\012' < $i | sort | uniq -c | sort -k 1nr | grep -n $2 | cut -d : -f1 | sort -n | head -n1) ]]
+                then
+                    file="$(basename "$i")"
+            fi
+        done
+        echo "The most significant rank for the word $2 is $value in file $file"
+        rm freq_rank.txt;;
+    *)
+        for f in $1/*
+        do
+                tr -cs '[A-Za-z]' '\012' < $f | sort | uniq -c | sort -k 1nr | head -1 | tail -n1 | awk '{print $2}' >> sortword.txt
+        done
+        common_word=$(sort sortword.txt | uniq -c | sort -k 1nr | head -1 | awk '{print $2}')
+        value=$(sort sortword.txt | uniq -c | sort -k 1nr | head -1 | awk '{print $1}')
+        echo "The 1th most common word is \"$common_word\" across $value files"
+        rm sortword.txt;;
+esac
